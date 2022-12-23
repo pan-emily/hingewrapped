@@ -14,6 +14,7 @@ from dash import dcc, html
 import plotly.express as px
 import seaborn as sns
 
+
 def analyze_matches(dir):
     # get matches
     with open("matches.json") as f:
@@ -29,13 +30,15 @@ def analyze_matches(dir):
     matches["match_type"] = matches["blocks"].combine(matches['matches'], lambda a, b: ((a or "") + (b or "")) or None, None)
     matches["match_type"] = matches["match_type"].combine(matches['likes'], lambda a, b: ((a or "") + (b or "")) or None, None)
 
-    # # matches vs. liked vs. rejected 
-    # rejected = matches[~matches['block'].isna()]
-    # matched = matches[~matches['match'].isna()]
-    # liked = matches[~matches['like'].isna()]
-
+    # matches vs. liked vs. rejected 
+    rejected_ct = len(matches[~matches['block'].isna()])
+    matched_ct = len(matches[~matches['match'].isna()])
+    liked_ct = len(matches[~matches['like'].isna()])
+    match_counts = pd.DataFrame([['rejected_ct', rejected_ct], ['matched_ct', matched_ct], ['liked_ct', liked_ct]], 
+                                 columns=["match_type", "count"])
+    print(match_counts['count'])
     # return matches, rejected, matched, liked
-    return matches
+    return matches, match_counts
 
 def main():
     """ Main entry point of the app """
@@ -44,13 +47,56 @@ def main():
     dir = "/Users/emilypan/Documents/export"
     os.chdir(dir)
 
-    matches = analyze_matches(dir)
+    matches, match_counts = analyze_matches(dir)
 
-    # # plot pie chart of matches
-    # fig1 = px.pie(
-    #     matches # dataframe
-    #     values = 
-    # )
+    # plot pie chart of swipe breakdown 
+    fig1 = px.pie(
+        match_counts, # dataframe
+        values='count', 
+        names='match_type', 
+        title="Swipe Breakdown", 
+        labels={"rejected_ct" : "Rejected", "matched_ct" : "Matched", "liked_ct" : "Liked"}
+    )
+    # fig1.show()
+
+    app = dash.Dash(__name__)
+
+    app.layout = html.Div(
+        children=[
+            html.Div(
+                children=[
+                    html.P(children="🚓", style={'fontSize': "30px",'textAlign': 'center'}, className="header-emoji"), #emoji
+                    html.H1(
+                        children="Crime Analytics",style={'textAlign': 'center'}, className="header-title" 
+                    ), #Header title
+                    html.H2(
+                        children="Analyze the crime records"
+                        " by district in New Zealand"
+                        " between 1994 and 2014",
+                        className="header-description", style={'textAlign': 'center'},
+                    ),
+                ],
+                className="header",style={'backgroundColor':'#F5F5F5'},
+            ), #Description below the header
+        
+            
+            html.Div(
+                children=[
+                    html.Div(
+                    children = dcc.Graph(
+                        id = 'pie',
+                        figure = fig1,
+                    #  config={"displayModeBar": False},
+                    ),
+                    style={'width': '50%', 'display': 'inline-block'},
+                ),
+            ],
+            className = 'double-graph',
+            ), 
+        ]
+    ) #Four graphs
+
+    app.run_server(debug=True)
     
 
 

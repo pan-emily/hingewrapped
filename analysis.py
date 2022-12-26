@@ -15,6 +15,7 @@ import dash_daq as daq
 import plotly.express as px
 import plotly.graph_objs as go
 import seaborn as sns
+from datetime import datetime
 
 def process_matches(matches):
     matches["blocks"] = matches['block'].where(matches['block'].isna(), 'reject')
@@ -53,6 +54,44 @@ def analyze_matches(dir):
     # return matches, rejected, matched, liked
     return matches, match_counts
 
+def parse_time(active_months, active_times, dt):
+    month_to_alpha = {'01': 'January', '02': 'February', '03': 'March', '04': 'April', '05': 'May', '06': 'June', 
+                    '07': 'July', '08': 'August', '09': 'September', '10': 'October', '11': 'November', '12': 'December'}
+    day_raw, time_raw = dt.split('T')
+    year, month, day = day_raw.split('-')
+    hour = time_raw.split(':')[0]
+    if year == '2022':
+        active_months[month_to_alpha[month]] += 1
+        active_times[hour] += 1
+    return active_months, active_times
+
+def analyze_activity(matches):
+    active_months = {'January': 0, 'February': 0, 'March': 0, 'April': 0, 'May': 0, 
+                'June': 0, 'July': 0, 'August': 0, 'September': 0, 'October': 0, 
+                'November': 0, 'December': 0}
+    active_times = {'00': 0, '01': 0, '02': 0, '03': 0, '04': 0, '05': 0, '06': 0, 
+                    '07': 0, '08': 0, '09': 0, '10': 0, '11': 0, '12': 0, '13': 0, 
+                    '14': 0, '15': 0, '16': 0, '17': 0, '18': 0, '19': 0, '20': 0, 
+                    '21': 0, '22': 0, '23': 0}
+    for index, row in matches.iterrows():
+        if type(row['like']) == type([]):
+            # date in form yyyy-mm-ddThh:mm:ss
+            dt = row['like'][0]['timestamp']
+            active_months, active_times = parse_time(active_months, active_times, dt)
+        if type(row['match']) == type([]):
+            # date in form yyyy-mm-ddThh:mm:ss
+            dt = row['match'][0]['timestamp']
+            active_months, active_times = parse_time(active_months, active_times, dt)
+        if type(row['block']) == type([]):
+            # date in form yyyy-mm-ddThh:mm:ss
+            dt = row['block'][0]['timestamp']
+            active_months, active_times = parse_time(active_months, active_times, dt)
+
+    months = pd.DataFrame(list(active_months.items()), columns=['Month', 'Swipes'])
+    hours = pd.DataFrame(list(active_times.items()), columns=['Hour', 'Swipes'])
+            
+    return months , hours
+
 
 def main():
     """ Main entry point of the app """
@@ -62,6 +101,7 @@ def main():
     os.chdir(dir)
 
     matches, match_counts = analyze_matches(dir)
+    months, hours = analyze_activity(matches)
 
     # calculate total swipes
     total_swipes = len(matches)
@@ -111,6 +151,10 @@ def main():
         xaxis=dict(showgrid=False,zeroline= False, showline=False, visible=False, showticklabels=False),
         yaxis=dict(showgrid=False,zeroline= False, showline=False, visible=False, showticklabels=False),
     )))
+
+    fig3 = px.bar(months, x='Month', y='Swipes')
+
+    fig4 = px.bar(hours, x='Hour', y='Swipes')
 
     app = dash.Dash(__name__)
 
@@ -199,11 +243,27 @@ def main():
                         ],
                     )
                 ]
+            ), 
+
+            html.Div(
+                children=[
+                    html.Div(
+                        children=[
+                            dcc.Graph(figure=fig3), 
+                        ]
+                    ), 
+                    html.Div(
+                        children=[
+                            dcc.Graph(figure=fig4), 
+                        ]
+                    )
+                ]
             )
         ]
     ) #Four graphs
 
     app.run_server(debug=True)
+    # app.run_server()
     
 
 

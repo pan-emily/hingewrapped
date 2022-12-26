@@ -96,8 +96,7 @@ def analyze_activity(matches):
 def main():
     """ Main entry point of the app """
     # get the location of 'export' data:
-    # dir = input("Enter directory of export folder: ")
-    dir='/Users/emilypan/Documents/export'
+    dir = input("Enter directory of export folder: ")
     currdir = os.getcwd()
     os.chdir(dir)
 
@@ -268,8 +267,8 @@ def main():
         ],
     ) 
 
-    app.run_server(debug=True)
-    # app.run_server()
+    # app.run_server(debug=True)
+    app.run_server()
     
 
 

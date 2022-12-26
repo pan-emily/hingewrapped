@@ -1,4 +1,4 @@
-# hingewrapped
+# Hinge Wrapped
 ## 2022 Dating Wrapped, Hinge Edition
 
 Welcome to my Hinge Data visualizer! After seeing the trend of creating "Dating Wrapped" slideshows to recap a year of dating, I decided to leverage Hinge's "Download My Data" feature to be able to make a personalized dashboard of this year's Hinge Wrapped! 

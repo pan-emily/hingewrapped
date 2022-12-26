@@ -96,12 +96,15 @@ def analyze_activity(matches):
 def main():
     """ Main entry point of the app """
     # get the location of 'export' data:
-    # dir = input()
-    dir = "/Users/emilypan/Documents/export"
+    # dir = input("Enter directory of export folder: ")
+    dir='/Users/emilypan/Documents/export'
+    currdir = os.getcwd()
     os.chdir(dir)
 
     matches, match_counts = analyze_matches(dir)
     months, hours = analyze_activity(matches)
+
+    os.chdir(currdir)
 
     # calculate total swipes
     total_swipes = len(matches)
@@ -119,13 +122,11 @@ def main():
         names='match_type', 
         title='Swipe Breakdown'
     )
-    # fig1.show()
 
     # waffle plot of all people -> matched -> met (not matched + (matched - met) + met)
     waffle_data = pd.Series({'Rejected' : match_counts['count'][0], 'Matched but Not Met' : total_matches - total_met, 'Met' : total_met})
     title = 'How You Swiped'
 
-    # ds = pd.Series({'Alpha' : 67, 'Bravo' : 30, 'Charlie' : 20, 'Delta': 12, 'Echo': 23, 'Foxtrot': 56})
     Xlim = 50
     Ylim = 13
     Xpos = 0
@@ -162,33 +163,38 @@ def main():
         children=[
             html.Div(
                 children=[
-                    html.P(children="🚓", style={'fontSize': "30px",'textAlign': 'center'}, className="header-emoji"), #emoji
+                    html.Div( children=[
+                        html.Img(src='assets/hinge_logo.png', style={'height':'50%', 'width':'50%'})
+                        ], style={'textAlign': 'center'}
+                    ),
                     html.H1(
-                        children="2022 Hinge Wrapped",style={'textAlign': 'center'}, className="header-title" 
+                        children="2022 Hinge Wrapped",style={'textAlign': 'center', 'font-family':'impact, sans-serif', 'font-size':'40px'}, className="header-title" 
                     ), #Header title
                     html.H2(
                         children="Dating Wrapped, but using real Hinge data",
-                        className="header-description", style={'textAlign': 'center'},
+                        style={'textAlign': 'center', 'font-family': 'gill sans, sans-serif', 'color': '#808080'},
                     ),
                 ],
-                className="header",style={'backgroundColor':'#F5F5F5'},
+                className="header", # style={'backgroundColor':'#F5F5F5'},
             ), #Description below the header
 
             html.Div(
                 children=[ 
                     html.Div(
-                        children=[
-                            html.P(children="🚓"),
-                        ],
-                        style={'height':100, 'width':'40%', 'fontSize': "30px",'display':'inline-block', 'float': 'left', 'margin-left':100, 'mragin-right':0}
-                    ),
-                    html.Div(
                         children=[ 
-                            html.P(
+                            html.H2(
                                 children="This year, you swiped on {total_swipes} people. ".format(total_swipes=total_swipes),
+                                style={'fontSize':'35px', 'font-family': 'gill sans, sans-serif'}
                             ),
-                        ], style={'height':100, 'width':'40%', 'display':'inline-block', 'float':'right', 'textAlign':'center'}
-                    )  
+                        ], style={'height':'100%', 'width':'50%', 'display':'inline-block', 'float':'left', 'margin-left' : '20%', 'textAlign':'center', }
+                    ), 
+                    html.Div(
+                        children=[
+                            html.Img(src='assets/trophy.png', style={'width':'60%'})
+                        ],
+                        style={'height':'100%', 'width':'20%', 'fontSize': "30px",'display':'inline-block', 'mragin-right':0}
+                    )
+                     
                 ]
             ),
         
@@ -259,8 +265,8 @@ def main():
                     )
                 ]
             )
-        ]
-    ) #Four graphs
+        ],
+    ) 
 
     app.run_server(debug=True)
     # app.run_server()

@@ -152,9 +152,11 @@ def main():
         yaxis=dict(showgrid=False,zeroline= False, showline=False, visible=False, showticklabels=False),
     )))
 
-    fig3 = px.bar(months, x='Month', y='Swipes')
+    fig3 = px.bar(months, x='Month', y='Swipes', 
+            title="Activity by Month")
 
-    fig4 = px.bar(hours, x='Hour', y='Swipes')
+    fig4 = px.bar(hours, x='Hour', y='Swipes', 
+        title="Activity by Hour")
 
     app = dash.Dash(__name__)
 
@@ -204,7 +206,7 @@ def main():
                             id = 'pie',
                             figure = fig1,
                             ),
-                    ],  style={'height':300, 'width':500, 'float':'left', 'margin':0}# style={'padding': 10, 'flex': 1}
+                    ],  style={'height':300, 'width':'50%', 'float':'left', 'margin':0}# style={'padding': 10, 'flex': 1}
                 ), 
 
                 html.Div(
@@ -212,12 +214,13 @@ def main():
                         html.P(
                             children="Out of the {total_swipes} people you met, you matched with {match_percentage}% of them.".format(total_swipes=total_swipes,
                                         match_percentage=match_percentage), 
-                            style={'margin-top': 25}, 
+                            style={'fontSize':'35px', 'font-family':'impact, sans-serif', 'margin-top': 120,
+                                    'margin-left': 10, 'margin-right':10, 'textAlign':'center', 'color':'white'}, 
                         ),
                     ],  style={
                         'height':350, 
-                        'width':400, 
-                        'background-color':'#3BA27A', 
+                        'width':'50%', 
+                        'background-color':'#636ef9', 
                         'float':'right', 
                         'margin':0, 
                         'margin-top':50}# style={'padding':10, 'flex':1}
@@ -230,12 +233,13 @@ def main():
                 children=[ 
                     html.Div(
                         children=[ 
-                            html.P(children="This year, you really enjoyed meeting new people. You met {we_met} people!".format(we_met=total_met)), 
+                            html.H2(children="This year, you really enjoyed meeting new people. You met {we_met} people!".format(we_met=total_met), 
+                            style={'fontSize':'35px', 'font-family': 'gill sans, sans-serif', 'textAlign':'center'}), 
                         ], 
                         style={
-                            'height':100, 
-                            'width':800, 
-                            'margin-top':700
+                            'height':'10%', 
+                            'width':'100%', 
+                            'margin-top':'50%'
                             # 'background-color':'#111111', 
                         }
                     ),
